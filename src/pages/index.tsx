@@ -5,14 +5,18 @@ import axios from "axios";
 
 const Home: NextPage = () => {
   const [query, setQuery] = useState<string>("");
+  const [fulfillmentText, setFulFillmentText] = useState<string>("");
 
   const handleAnalyze = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const result = await axios.get("http://localhost:8000/api/recognize", {
+      const result = await axios.get("http://localhost:8000/api/conversate", {
         params: { text: query },
       });
       console.log(result.data);
+      setFulFillmentText(
+        result.data[0].queryResult.responseMessages[0].text.text[0]
+      );
     } catch (error) {
       console.log(error);
     }
@@ -21,19 +25,24 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Emphatetic Chatbot</title>
+        <title>Buddy, Empathetic Chatdog</title>
       </Head>
-      <main>
-        <h1>Emphatetic Chatbot</h1>
-        <form onSubmit={handleAnalyze}>
-          <label>Text to Analyze</label>
-          <input
-            type="text"
-            value={query}
-            onChange={({ target }) => setQuery(target.value)}
-          ></input>
-          <button type="submit">Analyze</button>
-        </form>
+      <main className="buddyMain">
+        <div className="buddyContainer">
+          <div className="buddyChatbox">
+            <p>{fulfillmentText ?? fulfillmentText}</p>
+          </div>
+          <div className="buddyForm">
+            <form onSubmit={handleAnalyze}>
+              <input
+                type="text"
+                value={query}
+                onChange={({ target }) => setQuery(target.value)}
+              ></input>
+              <button type="submit">Send</button>
+            </form>
+          </div>
+        </div>
       </main>
     </>
   );
