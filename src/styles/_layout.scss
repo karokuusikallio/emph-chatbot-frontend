@@ -1,6 +1,17 @@
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+}
+
+#__next {
+  height: 100%;
+}
+
 .buddyBody {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
