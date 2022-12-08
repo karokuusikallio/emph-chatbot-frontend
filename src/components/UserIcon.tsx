@@ -3,18 +3,19 @@ import { playfairDisplay } from "../pages/_app";
 
 interface UserIconProps {
   sender: string;
+  className?: string;
 }
 
 const UserIcon = (props: UserIconProps) => {
-  if (props.sender === "Buddy") {
+  if (props.sender === "BOT") {
     return (
-      <div>
+      <div className="buddyIconContainer">
         <Image
           alt="good-boi"
           src="/../public/good-boi.png"
-          style={{ borderRadius: "50%", marginLeft: "1rem" }}
-          width="80"
-          height="80"
+          className={props.className ? props.className : "buddyBotIcon"}
+          fill
+          objectFit="contain"
         />
       </div>
     );

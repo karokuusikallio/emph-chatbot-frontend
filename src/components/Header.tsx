@@ -1,9 +1,9 @@
-import { playfairDisplay } from "../pages/_app";
+import UserIcon from "./UserIcon";
 
 const Header = () => {
   return (
     <div className="buddyHeader">
-      <h1 className={playfairDisplay.className}>Buddy, Empathetic Chatdog</h1>
+      <UserIcon sender="BOT" className="buddyBotIconHeader" />
     </div>
   );
 };
