@@ -14,7 +14,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     <>
       {username ? (
         <Menu>
-          <p>Hello</p>
+          <h1 className={`${playfairDisplay.className} buddyTitle`}>
+            Buddy, Empathetic Chatdog
+          </h1>
           <p>World</p>
         </Menu>
       ) : null}
