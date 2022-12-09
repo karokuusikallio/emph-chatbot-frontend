@@ -158,11 +158,11 @@
   background-color: $buddy-dark;
   color: $buddy-grey;
   margin-right: 1rem;
-  padding: 1rem 1.5rem;
+  padding: 0.8rem 1.3rem;
   border-radius: 50%;
   margin-top: 1.2rem;
   p {
-    font-size: 36px;
+    font-size: 34px;
   }
 }
 
@@ -172,12 +172,12 @@
 
 .buddyBotIconHeader {
   border-radius: 50%;
+  margin: 0 1rem;
 }
 
 .buddyIconContainer {
-  position: relative;
-  height: 80px;
-  width: 80px;
+  margin-top: 1rem;
+  margin-left: 1rem;
 }
 
 //LOADING SPINNER
@@ -243,7 +243,7 @@
   width: 36px;
   height: 30px;
   left: 36px;
-  top: 40px;
+  top: 50px;
 }
 
 /* Color/shape of burger icon bars */
@@ -281,6 +281,7 @@ Note: Beware of modifying this element as it can break the animations - you shou
   background: $buddy-dark;
   padding: 2em 1em 0;
   font-size: 1.15em;
+  overflow: hidden !important;
 }
 
 /* Morph shape necessary with bubble or elastic */
@@ -292,6 +293,10 @@ Note: Beware of modifying this element as it can break the animations - you shou
 .bm-item-list {
   color: white;
   margin-top: 2em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 80% !important;
 }
 
 /* Individual item */

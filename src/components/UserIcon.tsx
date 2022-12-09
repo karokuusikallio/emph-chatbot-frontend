@@ -3,7 +3,6 @@ import { playfairDisplay } from "../pages/_app";
 
 interface UserIconProps {
   sender: string;
-  className?: string;
 }
 
 const UserIcon = (props: UserIconProps) => {
@@ -12,10 +11,10 @@ const UserIcon = (props: UserIconProps) => {
       <div className="buddyIconContainer">
         <Image
           alt="good-boi"
-          src="/../public/good-boi.png"
-          className={props.className ? props.className : "buddyBotIcon"}
-          fill
-          objectFit="contain"
+          src="/good-boi.png"
+          className={"buddyBotIcon"}
+          height={65}
+          width={65}
         />
       </div>
     );

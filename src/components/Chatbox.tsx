@@ -41,12 +41,12 @@ const Chatbox = (props: ChatboxProps) => {
   }, [props.userName]);
 
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
+
     const getBotResponse = async () => {
-      let timeout;
       if (expectAnswer) {
         setWriting(true);
         clearTimeout(timeout);
-        setUserInput("");
         const responseFromConversate = await axios.get("/api/conversate", {
           params: { text: userInput },
         });
@@ -85,18 +85,24 @@ const Chatbox = (props: ChatboxProps) => {
     }
   }, [messages, writing]);
 
+  let timeoutForUserInput: NodeJS.Timeout;
+
   const handleUserInput = async (e: FormEvent<HTMLFormElement>) => {
+    clearTimeout(timeoutForUserInput);
     e.preventDefault();
     const userMessage = {
       sender: "USER",
       text: userInput,
     };
 
-    setExpectAnswer(true);
-
     const response = await axios.post("/api/messages", userMessage);
     const newMessages = messages.concat(response.data as Message);
     setMessages(newMessages);
+    setUserInput("");
+
+    timeoutForUserInput = setTimeout(() => {
+      setExpectAnswer(true);
+    }, 2000);
   };
 
   return (

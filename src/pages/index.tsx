@@ -1,7 +1,5 @@
 import { type NextPage } from "next";
 import { useState, FormEvent, useEffect } from "react";
-import Head from "next/head";
-
 import axios from "axios";
 
 import Header from "../components/Header";
@@ -9,11 +7,11 @@ import Footer from "../components/Footer";
 import Chatbox from "../components/Chatbox";
 import LoginForm from "../components/LoginForm";
 
-interface HomePageProps extends NextPage {
+type HomePageProps = {
   passUsername: (username: string) => void;
-}
+};
 
-const Home: NextPage = (props: HomePageProps) => {
+const Home: NextPage<HomePageProps> = (props: HomePageProps) => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [username, setUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -22,8 +20,10 @@ const Home: NextPage = (props: HomePageProps) => {
     const getUserDetails = async () => {
       try {
         const response = await axios.get("/api/user/me");
-        props.passUsername(response.data.userName);
-        setUsername(response.data.userName);
+        if (response.data.userName) {
+          props.passUsername(response.data.userName);
+          setUsername(response.data.userName);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -58,9 +58,6 @@ const Home: NextPage = (props: HomePageProps) => {
   if (loading) {
     return (
       <>
-        <Head>
-          <title>Buddy, Empathetic Chatdog</title>
-        </Head>
         <div className="buddyBody">
           <Header />
           <p>Loading...</p>
@@ -73,9 +70,6 @@ const Home: NextPage = (props: HomePageProps) => {
   if (username) {
     return (
       <>
-        <Head>
-          <title>Buddy, Empathetic Chatdog</title>
-        </Head>
         <div className="buddyBody">
           <Header />
           <Chatbox userName={username} loggedIn={loggedIn} />
@@ -88,7 +82,7 @@ const Home: NextPage = (props: HomePageProps) => {
   return (
     <div className="buddyBody">
       <Header />
-      <LoginForm handleLogin={handleLogin} />;
+      <LoginForm handleLogin={handleLogin} />
       <Footer />
     </div>
   );
