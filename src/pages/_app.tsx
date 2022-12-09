@@ -45,11 +45,21 @@ const MyApp: AppType = ({ Component, pageProps }) => {
             >
               Buddy, Empathetic Chatdog
             </h1>
-            <p onClick={handleClearChatHistory}>Clear chat history</p>
+            <button className="buddyButton" onClick={handleClearChatHistory}>
+              Clear Chat History
+            </button>
           </div>
           <div className="buddyLogoutOptions">
-            <p>Logged in as {username}</p>
-            <p onClick={handleLogout}>Log out</p>
+            <p>
+              Logged in as <span style={{ color: "#e1acc5" }}>{username}</span>
+            </p>
+            <button
+              className="buddyButton"
+              onClick={handleLogout}
+              style={{ marginTop: "1rem" }}
+            >
+              Log Out
+            </button>
           </div>
         </Menu>
       ) : null}

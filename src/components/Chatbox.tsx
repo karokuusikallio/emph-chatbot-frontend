@@ -150,8 +150,8 @@ const Chatbox = (props: ChatboxProps) => {
               value={userInput}
               onChange={({ target }) => setUserInput(target.value)}
             ></input>
-            <button type="submit" disabled={!userInput}>
-              SEND
+            <button type="submit" className="buddyButton" disabled={!userInput}>
+              Send
             </button>
           </form>
         </div>

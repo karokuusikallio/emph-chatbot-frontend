@@ -14,6 +14,12 @@
   font-size: 2.5rem;
 }
 
+.buddyTitleHeader {
+  @media (max-width: 590px) {
+    display: none;
+  }
+}
+
 .buddyFooter {
   text-align: center;
   display: flex;
@@ -47,7 +53,7 @@
   width: 70%;
   max-width: 800px;
   flex: 1 1 auto;
-  padding-bottom: 40px;
+  padding-bottom: 50px;
 }
 
 .buddyChatbox {
@@ -66,7 +72,7 @@
 
 .buddyForm {
   position: relative;
-  height: 40px;
+  height: 50px;
   background-color: $buddy-grey;
   display: flex;
   align-items: center;
@@ -78,10 +84,10 @@
     flex-direction: row;
     width: 100%;
     height: 100%;
-    min-height: 40px;
+    min-height: 50px;
     justify-content: space-between;
     align-items: center;
-    padding: 0 1rem;
+    padding: 1rem;
     input {
       height: 100%;
       width: 70%;
@@ -94,19 +100,21 @@
         outline: none;
       }
     }
+  }
+}
 
-    button {
-      all: unset;
-      cursor: pointer;
-      background: $buddy-pink;
-      border-radius: 15px;
-      color: white;
-      padding: 0.5rem;
+.buddyButton {
+  all: unset;
+  cursor: pointer;
+  background: $buddy-pink;
+  font-weight: 500;
+  text-transform: uppercase;
+  border-radius: 15px;
+  color: white;
+  padding: 0.7rem;
 
-      &:hover {
-        background: $buddy-grey;
-      }
-    }
+  &:hover {
+    background: $buddy-grey;
   }
 }
 
@@ -121,7 +129,7 @@
     background: $buddy-pink;
     display: inline-block;
     border-radius: 15px;
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     min-width: 150px;
     p {
       margin: 0.5rem 0;
@@ -139,7 +147,7 @@
     background: $buddy-dark;
     display: inline-block;
     border-radius: 15px;
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     min-width: 150px;
 
     p {
