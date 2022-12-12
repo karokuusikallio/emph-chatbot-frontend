@@ -65,7 +65,7 @@ const apiProxy = (req: NextApiRequest, res: NextApiResponse) => {
     proxy.web(req, res, {
       target: API_URL,
       autoRewrite: false,
-
+      changeOrigin: false,
       selfHandleResponse: isLogin,
     });
   });

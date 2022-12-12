@@ -15,3 +15,80 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+.buddyBackgroundImage {
+  height: 100%;
+  background: url("../../public/pexels-alice-castro-1870301.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.buddyLoginPage {
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 4rem;
+  h1 {
+    font-size: 32px;
+    color: $buddy-pink;
+    line-height: 2.5rem;
+  }
+
+  h2,
+  p,
+  label {
+    color: white;
+  }
+}
+
+.buddyLoginForm {
+  display: flex;
+  flex-direction: column;
+  margin: 1.5rem 0;
+  border: 2px solid white;
+  border-radius: 5px;
+  padding: 1rem;
+  max-width: 400px;
+
+  h2 {
+    margin-bottom: 1rem;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+
+    label,
+    input {
+      margin: 0.2rem 0;
+    }
+
+    input {
+      background: none;
+      border: 2px solid white;
+      border-radius: 5px;
+      padding: 0.4rem;
+      box-shadow: none;
+      color: white;
+    }
+
+    textarea:focus,
+    input:focus {
+      outline: none;
+    }
+  }
+}
+
+.buddyCreateForm {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+}
+
+.buddyLoadingPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

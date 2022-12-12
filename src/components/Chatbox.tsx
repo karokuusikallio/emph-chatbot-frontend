@@ -6,7 +6,7 @@ import UserIcon from "../components/UserIcon";
 interface Message {
   sender: string;
   text: string;
-  createdAt: Date;
+  createdAt: string;
   id: string;
 }
 
@@ -23,14 +23,18 @@ const Chatbox = (props: ChatboxProps) => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const messageTimeToLocal = (message: Message) => {
+    const localDate = new Date(message.createdAt);
+    return { ...message, createdAt: localDate.toLocaleString() };
+  };
+
   useEffect(() => {
     const getMessages = async () => {
       if (props.userName) {
         const response = await axios.get("/api/messages");
         if (response.data.length > 0) {
           const messagesTimeToLocal = response.data.map((message: Message) => {
-            const localDate = new Date(message.createdAt);
-            return { ...message, createdAt: localDate };
+            return messageTimeToLocal(message);
           });
 
           setMessages(messagesTimeToLocal);
@@ -38,7 +42,7 @@ const Chatbox = (props: ChatboxProps) => {
       }
     };
     getMessages();
-  }, [props.userName]);
+  }, [props.userName, expectAnswer]);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -57,13 +61,12 @@ const Chatbox = (props: ChatboxProps) => {
             .text.text[0],
         };
 
-        const responseFromMessages = await axios.post(
-          "/api/messages",
-          botMessage
+        const response = await axios.post("/api/messages", botMessage);
+
+        const messageWithLocalTime = messageTimeToLocal(
+          response.data as Message
         );
-        const newMessages = messages.concat(
-          responseFromMessages.data as Message
-        );
+        const newMessages = messages.concat(messageWithLocalTime);
 
         timeout = setTimeout(() => {
           setMessages(newMessages);
@@ -96,7 +99,10 @@ const Chatbox = (props: ChatboxProps) => {
     };
 
     const response = await axios.post("/api/messages", userMessage);
-    const newMessages = messages.concat(response.data as Message);
+
+    const messageWithLocalTime = messageTimeToLocal(response.data as Message);
+    const newMessages = messages.concat(messageWithLocalTime);
+
     setMessages(newMessages);
     setUserInput("");
 
