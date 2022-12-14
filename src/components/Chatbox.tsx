@@ -6,31 +6,35 @@ import UserIcon from "../components/UserIcon";
 interface Message {
   sender: string;
   text: string;
-  createdAt: string;
-  id: string;
+  createdAt: Date;
+  timestamp?: string;
 }
+
+type loadingStates = "idle" | "loading" | "finished";
 
 interface ChatboxProps {
   userName: string | null;
-  loggedIn: boolean;
+  loading: loadingStates;
 }
 
 const Chatbox = (props: ChatboxProps) => {
   const [userInput, setUserInput] = useState<string>("");
-  const [expectAnswer, setExpectAnswer] = useState<boolean>(false);
   const [writing, setWriting] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  let timeout: NodeJS.Timeout;
 
-  const messageTimeToLocal = (message: Message) => {
+  const messageTimeToLocal = (message: Message): Message => {
     const localDate = new Date(message.createdAt);
-    return { ...message, createdAt: localDate.toLocaleString() };
+    return { ...message, timestamp: localDate.toLocaleString() };
   };
 
   useEffect(() => {
     const getMessages = async () => {
-      if (props.userName) {
+      if (props.loading === "finished") {
+        setLoading(true);
         const response = await axios.get("/api/messages");
         if (response.data.length > 0) {
           const messagesTimeToLocal = response.data.map((message: Message) => {
@@ -39,44 +43,11 @@ const Chatbox = (props: ChatboxProps) => {
 
           setMessages(messagesTimeToLocal);
         }
+        setLoading(false);
       }
     };
     getMessages();
-  }, [props.userName, expectAnswer]);
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-
-    const getBotResponse = async () => {
-      if (expectAnswer) {
-        setWriting(true);
-        clearTimeout(timeout);
-        const responseFromConversate = await axios.get("/api/conversate", {
-          params: { text: userInput },
-        });
-
-        const botMessage = {
-          sender: "BOT",
-          text: responseFromConversate.data[0].queryResult.responseMessages[0]
-            .text.text[0],
-        };
-
-        const response = await axios.post("/api/messages", botMessage);
-
-        const messageWithLocalTime = messageTimeToLocal(
-          response.data as Message
-        );
-        const newMessages = messages.concat(messageWithLocalTime);
-
-        timeout = setTimeout(() => {
-          setMessages(newMessages);
-          setWriting(false);
-          setExpectAnswer(false);
-        }, 2000);
-      }
-    };
-    getBotResponse();
-  }, [expectAnswer]);
+  }, [props.loading]);
 
   useEffect(() => {
     const chatbox = document.querySelector(".buddyChatbox");
@@ -88,55 +59,102 @@ const Chatbox = (props: ChatboxProps) => {
     }
   }, [messages, writing]);
 
-  let timeoutForUserInput: NodeJS.Timeout;
-
   const handleUserInput = async (e: FormEvent<HTMLFormElement>) => {
-    clearTimeout(timeoutForUserInput);
     e.preventDefault();
     const userMessage = {
       sender: "USER",
       text: userInput,
+      createdAt: new Date(),
     };
 
-    const response = await axios.post("/api/messages", userMessage);
-
-    const messageWithLocalTime = messageTimeToLocal(response.data as Message);
-    const newMessages = messages.concat(messageWithLocalTime);
-
-    setMessages(newMessages);
+    const userMessageWithLocalTime = messageTimeToLocal(userMessage);
+    const updatedMessages = [...messages, userMessageWithLocalTime];
+    setMessages(updatedMessages);
     setUserInput("");
 
-    timeoutForUserInput = setTimeout(() => {
-      setExpectAnswer(true);
-    }, 2000);
+    try {
+      await axios.post("/api/messages", userMessage);
+    } catch (error) {
+      console.log(error);
+    }
+
+    return getBotResponse(updatedMessages);
+  };
+
+  const getBotResponse = async (updatedMessages: Message[]) => {
+    setWriting(true);
+    clearTimeout(timeout);
+
+    let latestMessage: string | undefined;
+    if (updatedMessages.length > 0) {
+      latestMessage = updatedMessages.at(-1)?.text;
+    }
+
+    try {
+      const responseFromConversate = await axios.get("/api/conversate", {
+        params: { text: latestMessage },
+      });
+
+      if (
+        responseFromConversate.data[0].queryResult.responseMessages[0].text
+          .text[0]
+      ) {
+        const botMessage = {
+          sender: "BOT",
+          text: responseFromConversate.data[0].queryResult.responseMessages[0]
+            .text.text[0],
+          createdAt: new Date(),
+        };
+
+        const botMessageWithLocalTime = messageTimeToLocal(botMessage);
+        const newMessages = updatedMessages.concat(botMessageWithLocalTime);
+
+        timeout = setTimeout(async () => {
+          setMessages(newMessages);
+          setWriting(false);
+
+          try {
+            await axios.post("/api/messages", botMessage);
+          } catch (error) {
+            console.log(error);
+          }
+
+          return;
+        }, 2000);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <main className="buddyMain">
       <div className="buddyContainer">
         <div className="buddyChatbox" ref={messagesEndRef}>
-          {messages.length > 0
-            ? messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={
-                    message.sender === "BOT"
-                      ? "buddyMessageBot"
-                      : "buddyMessageUser"
-                  }
-                >
-                  <UserIcon sender={message.sender} />
-                  <div>
-                    <p className="buddyTimeStamp">
-                      {message.createdAt.toLocaleString()}
-                    </p>
-                    <div className="buddyChatBubble">
-                      <p>{message.text}</p>
-                    </div>
+          {loading ? (
+            <div className="lds-heart">
+              <div></div>
+            </div>
+          ) : messages.length > 0 ? (
+            messages.map((message, index) => (
+              <div
+                key={index}
+                className={
+                  message.sender === "BOT"
+                    ? "buddyMessageBot"
+                    : "buddyMessageUser"
+                }
+              >
+                <UserIcon sender={message.sender} />
+                <div>
+                  <p className="buddyTimeStamp">{message.timestamp}</p>
+                  <div className="buddyChatBubble">
+                    <p>{message.text}</p>
                   </div>
                 </div>
-              ))
-            : null}
+              </div>
+            ))
+          ) : null}
           {writing ? (
             <div className="buddyMessageBot">
               <UserIcon sender="BOT" />

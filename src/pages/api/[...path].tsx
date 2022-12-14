@@ -15,6 +15,34 @@ export const config = {
 
 const apiProxy = (req: NextApiRequest, res: NextApiResponse) => {
   return new Promise<void>((resolve, reject) => {
+    const interceptLoginResponse = (proxyRes: http.IncomingMessage) => {
+      let apiResponseBody = "";
+      proxyRes.on("data", (chunk) => {
+        apiResponseBody += chunk;
+      });
+      proxyRes.on("end", () => {
+        const { authToken } = JSON.parse(apiResponseBody);
+        if (authToken) {
+          const cookies = new Cookies(req, res);
+          cookies.set("auth-token", authToken, {
+            httpOnly: true,
+            sameSite: "lax",
+          });
+          return res.status(200).json({ loggedIn: true });
+        }
+
+        return res.status(400).json({ error: "Invalid credentials." });
+      });
+    };
+
+    const interceptLogoutRequest = () => {
+      const cookies = new Cookies(req, res);
+      cookies.set("auth-token", "", {
+        expires: new Date("1995-12-17T03:24:00"),
+      });
+      return res.status(200).json({ loggedIn: false });
+    };
+
     const pathname = url.parse(req.url as string).pathname;
     const isLogin = pathname === "/api/login";
     const isLogout = pathname === "/api/logout";
@@ -26,38 +54,9 @@ const apiProxy = (req: NextApiRequest, res: NextApiResponse) => {
       req.headers["auth-token"] = authToken;
     }
     if (isLogin) {
-      const interceptLoginResponse = (proxyRes: http.IncomingMessage) => {
-        let apiResponseBody = "";
-        proxyRes.on("data", (chunk) => {
-          apiResponseBody += chunk;
-        });
-        proxyRes.on("end", () => {
-          try {
-            const { authToken } = JSON.parse(apiResponseBody);
-            const cookies = new Cookies(req, res);
-            cookies.set("auth-token", authToken, {
-              httpOnly: true,
-              sameSite: "lax",
-            });
-            res.status(200).json({ loggedIn: true });
-            resolve();
-          } catch (error) {
-            res.status(400).json({ error });
-          }
-        });
-      };
       proxy.once("proxyRes", interceptLoginResponse);
     }
     if (isLogout) {
-      const interceptLogoutRequest = () => {
-        const cookies = new Cookies(req, res);
-        cookies.set("auth-token", "", {
-          expires: new Date("1995-12-17T03:24:00"),
-        });
-        res.status(200).json({ loggedIn: false });
-        resolve();
-      };
-
       proxy.once("proxyReq", interceptLogoutRequest);
     }
 
@@ -65,8 +64,8 @@ const apiProxy = (req: NextApiRequest, res: NextApiResponse) => {
     proxy.web(req, res, {
       target: API_URL,
       autoRewrite: false,
-      changeOrigin: false,
-      selfHandleResponse: isLogin,
+      changeOrigin: true,
+      selfHandleResponse: isLogin || isLogout,
     });
   });
 };
