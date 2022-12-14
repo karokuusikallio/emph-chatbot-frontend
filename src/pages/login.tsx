@@ -10,7 +10,13 @@ import Togglable from "../components/Togglable";
 import { playfairDisplay } from "./_app";
 import { useRouter } from "next/router";
 
-const Home: NextPage = () => {
+import { NOTIFICATION_TYPE } from "react-notifications-component";
+
+interface LoginPageProps {
+  showNotification: (title: string, type: NOTIFICATION_TYPE) => void;
+}
+
+const Home: NextPage<LoginPageProps> = (props: LoginPageProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [createUserFormVisible, setCreateUserFormVisible] =
     useState<boolean>(false);
@@ -51,14 +57,17 @@ const Home: NextPage = () => {
         const { loggedIn } = response.data;
 
         if (loggedIn) {
-          console.log(loggedIn);
           router.push("/");
           return;
         }
       } catch (error) {
-        console.log(error);
-        setLoading(false);
+        if (axios.isAxiosError(error) && error.response) {
+          props.showNotification(error.response.data.error, "danger");
+        } else {
+          console.log(error);
+        }
       }
+      setLoading(false);
     }
   };
 
@@ -76,12 +85,18 @@ const Home: NextPage = () => {
           username,
           password,
         });
-        console.log(`User ${response.data.username} created.`);
-        setLoading(false);
+        props.showNotification(
+          `User ${response.data.username} created.`,
+          "success"
+        );
       } catch (error) {
-        console.log(error);
-        setLoading(false);
+        if (axios.isAxiosError(error) && error.response) {
+          props.showNotification(error.response.data.error, "danger");
+        } else {
+          console.log(error);
+        }
       }
+      setLoading(false);
     }
   };
 

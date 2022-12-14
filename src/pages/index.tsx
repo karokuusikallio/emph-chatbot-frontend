@@ -7,10 +7,13 @@ import Footer from "../components/Footer";
 import Chatbox from "../components/Chatbox";
 import { useRouter } from "next/router";
 
+import { NOTIFICATION_TYPE } from "react-notifications-component";
+
 type loadingStates = "idle" | "loading" | "finished";
 
 interface HomePageProps {
   passUsername: (username: string) => void;
+  showNotification: (title: string, type: NOTIFICATION_TYPE) => void;
 }
 
 const Home: NextPage<HomePageProps> = (props: HomePageProps) => {
