@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 
 interface TogglableProps {
   buttonLabel: string;
+  buttonId: string;
   children?: ReactNode;
   visible: boolean;
   setVisibility: (visible: boolean) => void;
@@ -17,6 +18,7 @@ const Togglable = (props: TogglableProps) => {
         <button
           className="buddyButton"
           onClick={() => props.setVisibility(!props.visible)}
+          id={props.buttonId}
         >
           {props.buttonLabel}
         </button>

@@ -1,0 +1,1 @@
+POST https://emph-chatbot-backend-development.up.railway.app/api/reset

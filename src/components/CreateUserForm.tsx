@@ -21,6 +21,7 @@ const CreateUserForm = (props: CreateNewUserProps) => {
           type="text"
           value={username}
           onChange={({ target }) => setUsername(target.value)}
+          id="newUsername"
         ></input>
         <label>Password</label>
         <input
@@ -28,8 +29,9 @@ const CreateUserForm = (props: CreateNewUserProps) => {
           value={password}
           onChange={({ target }) => setPassword(target.value)}
           minLength={7}
+          id="newPassword"
         ></input>
-        <button type="submit" className="buddyButton">
+        <button type="submit" className="buddyButton" id="submitNewUserForm">
           Create
         </button>
       </form>

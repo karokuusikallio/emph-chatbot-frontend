@@ -140,6 +140,7 @@ const Home: NextPage<LoginPageProps> = (props: LoginPageProps) => {
               visible={createUserFormVisible}
               setVisibility={setCreateUserFormVisible}
               buttonLabel="Create New User"
+              buttonId="createNewUser"
             >
               <CreateUserForm handleCreateNewUser={handleCreateNewUser} />
             </Togglable>

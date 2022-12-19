@@ -25,14 +25,16 @@ const LoginForm = (props: LoginFormProps) => {
             type="text"
             value={username}
             onChange={({ target }) => setUsername(target.value)}
+            id="loginUsername"
           ></input>
           <label>Password</label>
           <input
             type="password"
             value={password}
             onChange={({ target }) => setPassword(target.value)}
+            id="loginPassword"
           ></input>
-          <button type="submit" className="buddyButton">
+          <button type="submit" className="buddyButton" id="submitLogin">
             Login
           </button>
         </form>

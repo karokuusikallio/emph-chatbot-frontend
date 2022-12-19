@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { type AppType } from "next/dist/shared/lib/utils";
-import { slide as Menu } from "react-burger-menu";
 import axios from "axios";
 import Router from "next/router";
 import Head from "next/head";
@@ -11,6 +10,8 @@ import {
   Store,
   NOTIFICATION_TYPE,
 } from "react-notifications-component";
+
+import { slide as Menu } from "react-burger-menu";
 
 import { Playfair_Display } from "@next/font/google";
 
@@ -70,7 +71,11 @@ const MyApp: AppType = ({ Component, pageProps }) => {
             >
               Buddy, Empathetic Chatdog
             </h1>
-            <button className="buddyButton" onClick={handleClearChatHistory}>
+            <button
+              className="buddyButton"
+              onClick={handleClearChatHistory}
+              id="clearChat"
+            >
               Clear Chat History
             </button>
           </div>
@@ -82,6 +87,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
               className="buddyButton"
               onClick={handleLogout}
               style={{ marginTop: "1rem" }}
+              id="logOut"
             >
               Log Out
             </button>

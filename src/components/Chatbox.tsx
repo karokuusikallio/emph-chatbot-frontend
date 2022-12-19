@@ -21,7 +21,7 @@ const Chatbox = (props: ChatboxProps) => {
   const [userInput, setUserInput] = useState<string>("");
   const [writing, setWriting] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   let timeout: NodeJS.Timeout;
@@ -34,7 +34,6 @@ const Chatbox = (props: ChatboxProps) => {
   useEffect(() => {
     const getMessages = async () => {
       if (props.loading === "finished") {
-        setLoading(true);
         const response = await axios.get("/api/messages");
         if (response.data.length > 0) {
           const messagesTimeToLocal = response.data.map((message: Message) => {
@@ -154,7 +153,11 @@ const Chatbox = (props: ChatboxProps) => {
                 </div>
               </div>
             ))
-          ) : null}
+          ) : (
+            <p style={{ color: "#2b2d42" }}>
+              Don&apos;t be shy, write something!
+            </p>
+          )}
           {writing ? (
             <div className="buddyMessageBot">
               <UserIcon sender="BOT" />
@@ -173,8 +176,14 @@ const Chatbox = (props: ChatboxProps) => {
               type="text"
               value={userInput}
               onChange={({ target }) => setUserInput(target.value)}
+              id="userInput"
             ></input>
-            <button type="submit" className="buddyButton" disabled={!userInput}>
+            <button
+              type="submit"
+              className="buddyButton"
+              disabled={!userInput}
+              id="messageSendButton"
+            >
               Send
             </button>
           </form>
