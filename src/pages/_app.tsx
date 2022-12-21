@@ -60,6 +60,18 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     <>
       <Head>
         <title>Buddy, Empathetic Chatdog</title>
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/good-boi-favicon-32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/good-boi-favicon-16.png"
+        />
       </Head>
       <ReactNotifications />
       {username ? (
