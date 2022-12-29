@@ -144,8 +144,10 @@ const Chatbox = (props: ChatboxProps) => {
       <div className="buddyContainer">
         <div className="buddyChatbox" ref={messagesEndRef}>
           {loading ? (
-            <div className="lds-heart">
-              <div></div>
+            <div className="buddyLoaderDiv">
+              <div className="lds-heart">
+                <div></div>
+              </div>
             </div>
           ) : messages.length > 0 ? (
             messages.map((message, index) => (
@@ -205,7 +207,7 @@ const Chatbox = (props: ChatboxProps) => {
               </p>
             </div>
           )}
-          {props.sessionStatus === "idle" && (
+          {props.sessionStatus === "idle" && props.userName && (
             <div>
               <p
                 style={{
