@@ -2,6 +2,7 @@ import { useState, FormEvent, useEffect, useRef } from "react";
 import axios from "axios";
 
 import UserIcon from "../components/UserIcon";
+import type { SessionStatus } from "../pages/index";
 
 interface Message {
   sender: string;
@@ -14,7 +15,12 @@ type loadingStates = "idle" | "loading" | "finished";
 
 interface ChatboxProps {
   userName: string | null;
+  sessionId: string | null;
   loading: loadingStates;
+  getSessionId: () => Promise<string>;
+  handleEndSession: () => Promise<void>;
+  sessionStatus: SessionStatus;
+  setSessionStatus: (status: SessionStatus) => void;
 }
 
 const Chatbox = (props: ChatboxProps) => {
@@ -46,7 +52,7 @@ const Chatbox = (props: ChatboxProps) => {
       }
     };
     getMessages();
-  }, [props.loading]);
+  }, [props.loading, props.sessionId]);
 
   useEffect(() => {
     const chatbox = document.querySelector(".buddyChatbox");
@@ -60,6 +66,7 @@ const Chatbox = (props: ChatboxProps) => {
 
   const handleUserInput = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    props.setSessionStatus("ongoing");
     const userMessage = {
       sender: "USER",
       text: userInput,
@@ -84,14 +91,20 @@ const Chatbox = (props: ChatboxProps) => {
     setWriting(true);
     clearTimeout(timeout);
 
+    const conversationId = await props.getSessionId();
+
     let latestMessage: string | undefined;
     if (updatedMessages.length > 0) {
       latestMessage = updatedMessages.at(-1)?.text;
     }
 
     try {
+      const conversateParams = {
+        text: latestMessage,
+        sessionId: conversationId,
+      };
       const responseFromConversate = await axios.get("/api/conversate", {
-        params: { text: latestMessage },
+        params: conversateParams,
       });
 
       if (
@@ -153,11 +166,7 @@ const Chatbox = (props: ChatboxProps) => {
                 </div>
               </div>
             ))
-          ) : (
-            <p style={{ color: "#2b2d42" }}>
-              Don&apos;t be shy, write something!
-            </p>
-          )}
+          ) : null}
           {writing ? (
             <div className="buddyMessageBot">
               <UserIcon sender="BOT" />
@@ -168,6 +177,47 @@ const Chatbox = (props: ChatboxProps) => {
               </div>
             </div>
           ) : null}
+          {props.sessionId && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <button
+                className="buddyButton endSessionButton"
+                onClick={async () => await props.handleEndSession()}
+              >
+                End Session
+              </button>
+            </div>
+          )}
+          {props.sessionStatus === "ended" && (
+            <div>
+              <p
+                style={{
+                  textAlign: "center",
+                  color: "#2b2d42",
+                  padding: "2rem",
+                }}
+              >
+                --- SESSION ENDED ---
+              </p>
+            </div>
+          )}
+          {props.sessionStatus === "idle" && (
+            <div>
+              <p
+                style={{
+                  textAlign: "center",
+                  color: "#2b2d42",
+                  padding: "2rem",
+                }}
+              >
+                --- START A NEW CONVERSATION ---
+              </p>
+            </div>
+          )}
           <div id="messagesEnd"></div>
         </div>
         <div className="buddyForm">
@@ -177,6 +227,7 @@ const Chatbox = (props: ChatboxProps) => {
               value={userInput}
               onChange={({ target }) => setUserInput(target.value)}
               id="userInput"
+              autoComplete="off"
             ></input>
             <button
               type="submit"

@@ -1,6 +1,7 @@
 import { type NextPage } from "next";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -9,7 +10,8 @@ import { useRouter } from "next/router";
 
 import { NOTIFICATION_TYPE } from "react-notifications-component";
 
-type loadingStates = "idle" | "loading" | "finished";
+type LoadingStates = "idle" | "loading" | "finished";
+export type SessionStatus = "idle" | "ongoing" | "ended";
 
 interface HomePageProps {
   passUsername: (username: string) => void;
@@ -18,7 +20,9 @@ interface HomePageProps {
 
 const Home: NextPage<HomePageProps> = (props: HomePageProps) => {
   const [username, setUsername] = useState<string | null>(null);
-  const [loading, setLoading] = useState<loadingStates>("idle");
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [loading, setLoading] = useState<LoadingStates>("idle");
+  const [sessionStatus, setSessionStatus] = useState<SessionStatus>("idle");
 
   const router = useRouter();
 
@@ -30,6 +34,12 @@ const Home: NextPage<HomePageProps> = (props: HomePageProps) => {
         if (response.data.userName) {
           props.passUsername(response.data.userName);
           setUsername(response.data.userName);
+
+          if (response.data.conversationId) {
+            setSessionId(response.data.conversationId);
+            setSessionStatus("ongoing");
+          }
+
           setLoading("finished");
           return;
         }
@@ -43,11 +53,51 @@ const Home: NextPage<HomePageProps> = (props: HomePageProps) => {
     getUserDetails();
   }, []);
 
+  const getSessionId = async (): Promise<string> => {
+    const conversationId = sessionId ?? uuidv4();
+
+    if (sessionId === null) {
+      try {
+        const response = await axios.post("/api/session", {
+          username,
+          conversationId,
+        });
+        setSessionId(response.data.conversationId);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    return conversationId;
+  };
+
+  const handleEndSession = async (): Promise<void> => {
+    try {
+      await axios.delete("/api/session", {
+        data: {
+          username,
+        },
+      });
+      setSessionId(null);
+      setSessionStatus("ended");
+    } catch (error) {
+      console.log(error);
+    }
+    return;
+  };
+
   return (
     <>
       <div className="buddyBody">
         <Header />
-        <Chatbox userName={username} loading={loading} />
+        <Chatbox
+          userName={username}
+          sessionId={sessionId}
+          loading={loading}
+          getSessionId={getSessionId}
+          handleEndSession={handleEndSession}
+          sessionStatus={sessionStatus}
+          setSessionStatus={setSessionStatus}
+        />
         <Footer />
       </div>
     </>

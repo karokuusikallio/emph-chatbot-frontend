@@ -121,6 +121,14 @@
   }
 }
 
+.endSessionButton {
+  background: grey !important;
+
+  &:hover {
+    background: lightgrey !important;
+  }
+}
+
 .buddyMessageBot {
   max-width: 50%;
   display: flex;

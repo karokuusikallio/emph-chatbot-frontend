@@ -40,6 +40,11 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   const handleClearChatHistory = async () => {
     try {
       await axios.delete("/api/messages");
+      await axios.delete("/api/session", {
+        data: {
+          username,
+        },
+      });
       showNotification("Messages deleted.", "success");
       return Router.reload();
     } catch (error) {
